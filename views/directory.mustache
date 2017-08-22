@@ -20,8 +20,11 @@
   <div class="container">
     <div class="row">
       <div class="col-xs-12">
-        <a href="http://localhost:3000/unemployed">Looking for work</a>
-        <a href="http://localhost:3000/employed">Employed</a>
+        <ul class="nav nav-tabs">
+          <li id='all' role="presentation"><a href="http://localhost:3000/">All Employees</a></li>
+          <li id='unemployed' role="presentation"><a href="http://localhost:3000/unemployed">Looking for Work</a></li>
+          <li id='employed' role="presentation"><a href="http://localhost:3000/employed">Employed</a></li>
+        </ul>
       </div>
     </div>
     <div class="row">
@@ -65,6 +68,10 @@
       </div>
     </div>
   </div>
+
+  <script src="script.js">
+
+  </script>
 
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
