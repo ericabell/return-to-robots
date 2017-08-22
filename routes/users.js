@@ -1,5 +1,6 @@
 const express = require('express');
 // const data = require('../models/users');
+let data = {};
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
@@ -11,8 +12,23 @@ MongoClient.connect(url, function(err, db) {
   assert.equal(null, err);
   console.log("Connected successfully to server");
 
-  db.close();
+  findUsers(db, (docs) => {
+    // assign docs to data, just like we had it before
+    data.users = docs;
+    console.log(data);
+    db.close();
+  });
+
 });
+
+let findUsers = function(db, callback) {
+  let collection = db.collection('robots');
+  collection.find({}).toArray( (err, docs) => {
+    assert.equal(err, null);
+    console.log(`Found user records`);
+    callback(docs);
+  })
+}
 
 let router = express.Router();
 
