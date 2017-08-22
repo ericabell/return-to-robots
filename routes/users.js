@@ -67,12 +67,40 @@ let findEmployeesByCountry = function(country, callback) {
   });
 }
 
+let findEmployeesBySkill = function(skill, callback) {
+  // Use connect method to connect to the server
+  MongoClient.connect(url, function(err, db) {
+    assert.equal(null, err);
+    console.log("Connected successfully to server");
+
+    let collection = db.collection('robots');
+    collection.find({"skill": skill}).toArray( (err, docs) => {
+      assert.equal(err, null);
+      console.log(`Found user records`);
+      callback(docs);
+    });
+  });
+}
 
 let router = express.Router();
 
 router.get('/', (req, res) => {
   findUsers( (docs) => {
     data.users = docs;
+    // encode the skills
+    let uniqueSkills = [];
+    data.users = data.users.map((user)=> {
+      let listOfSkills = user.skills; // array of skills
+      let newSkillsList = [];
+      listOfSkills.forEach( (skill) => {
+        if( uniqueSkills.indexOf(skill) >= 0 ) {
+          console.log('Found duplicate skill: ' + skill);
+        }
+        newSkillsList.push({'text': skill, 'uri': encodeURIComponent(skill)});
+      })
+      user.skills = newSkillsList;
+      return user;
+    })
     res.render('directory', data);
   });
 });
@@ -100,6 +128,16 @@ router.get('/country/:name', (req, res) => {
   })
 })
 
+router.get('/skill/:skillname', (req, res) => {
+  // skill is going to come to us as URI encoded
+  console.log(req.params);
+  let searchSkill = decodeURIComponent(req.params.skillname);
+  console.log(`Skill search: ${searchSkill}`);
 
+  findEmployeesBySkill( searchSkill, (docs) => {
+    data.users = docs;
+    res.render('directory', data);
+  })
+})
 
 module.exports = router;
