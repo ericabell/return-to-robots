@@ -34,7 +34,7 @@
             <img class="img-circle" src="{{avatar}}" alt="image">
             <h3>{{name}}</h3>
             <p>
-              {{#address.city}} {{address.city}}, {{address.country}} | {{/address.city}} {{#job}} {{job}}, {{company}} {{/job}}  {{^job}} <span>Available for hire</span> {{/job}}
+              {{#address.city}} {{address.city}}, <a href="http://localhost:3000/country/{{address.country}}">{{address.country}}</a> | {{/address.city}} {{#job}} {{job}}, {{company}} {{/job}}  {{^job}} <span>Available for hire</span> {{/job}}
             </p>
             <p>
               {{email}} | {{phone}}

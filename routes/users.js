@@ -52,6 +52,21 @@ let findUnEmployedUsers = function(callback) {
   });
 }
 
+let findEmployeesByCountry = function(country, callback) {
+  // Use connect method to connect to the server
+  MongoClient.connect(url, function(err, db) {
+    assert.equal(null, err);
+    console.log("Connected successfully to server");
+
+    let collection = db.collection('robots');
+    collection.find({"address.country": {$eq: country}}).toArray( (err, docs) => {
+      assert.equal(err, null);
+      console.log(`Found user records`);
+      callback(docs);
+    });
+  });
+}
+
 
 let router = express.Router();
 
@@ -75,6 +90,15 @@ router.get('/unemployed', (req, res) => {
     res.render('directory', data);
   })
 });
+
+router.get('/country/:name', (req, res) => {
+  console.log(`Country search: ${req.params.name}`);
+  let country = req.params.name
+  findEmployeesByCountry( country, (docs) => {
+    data.users = docs;
+    res.render('directory', data);
+  })
+})
 
 
 
