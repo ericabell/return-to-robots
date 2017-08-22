@@ -1,5 +1,18 @@
 const express = require('express');
-const data = require('../models/users');
+// const data = require('../models/users');
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+
+// collection name is robots
+let url = 'mongodb://localhost:27017/test';
+
+// Use connect method to connect to the server
+MongoClient.connect(url, function(err, db) {
+  assert.equal(null, err);
+  console.log("Connected successfully to server");
+
+  db.close();
+});
 
 let router = express.Router();
 
