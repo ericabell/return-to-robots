@@ -74,12 +74,29 @@ let findEmployeesBySkill = function(skill, callback) {
     console.log("Connected successfully to server");
 
     let collection = db.collection('robots');
-    collection.find({"skill": skill}).toArray( (err, docs) => {
+    collection.find({"skills": skill}).toArray( (err, docs) => {
       assert.equal(err, null);
       console.log(`Found user records`);
       callback(docs);
     });
   });
+}
+
+let encodeSkills = function(data) {
+  let uniqueSkills = [];
+  data.users = data.users.map((user)=> {
+    let listOfSkills = user.skills; // array of skills
+    let newSkillsList = [];
+    listOfSkills.forEach( (skill) => {
+      if( uniqueSkills.indexOf(skill) >= 0 ) {
+        console.log('Found duplicate skill: ' + skill);
+      }
+      newSkillsList.push({'text': skill, 'uri': encodeURIComponent(skill)});
+    })
+    user.skills = newSkillsList;
+    return user;
+  })
+  return data;
 }
 
 let router = express.Router();
@@ -88,19 +105,7 @@ router.get('/', (req, res) => {
   findUsers( (docs) => {
     data.users = docs;
     // encode the skills
-    let uniqueSkills = [];
-    data.users = data.users.map((user)=> {
-      let listOfSkills = user.skills; // array of skills
-      let newSkillsList = [];
-      listOfSkills.forEach( (skill) => {
-        if( uniqueSkills.indexOf(skill) >= 0 ) {
-          console.log('Found duplicate skill: ' + skill);
-        }
-        newSkillsList.push({'text': skill, 'uri': encodeURIComponent(skill)});
-      })
-      user.skills = newSkillsList;
-      return user;
-    })
+    data = encodeSkills(data);
     res.render('directory', data);
   });
 });
@@ -108,6 +113,7 @@ router.get('/', (req, res) => {
 router.get('/employed', (req, res) => {
   findEmployedUsers( (docs) => {
     data.users = docs;
+    data = encodeSkills(data);
     res.render('directory', data);
   })
 });
@@ -115,6 +121,7 @@ router.get('/employed', (req, res) => {
 router.get('/unemployed', (req, res) => {
   findUnEmployedUsers( (docs) => {
     data.users = docs;
+    data = encodeSkills(data);
     res.render('directory', data);
   })
 });
@@ -124,18 +131,19 @@ router.get('/country/:name', (req, res) => {
   let country = req.params.name
   findEmployeesByCountry( country, (docs) => {
     data.users = docs;
+    data = encodeSkills(data);
     res.render('directory', data);
   })
 })
 
 router.get('/skill/:skillname', (req, res) => {
   // skill is going to come to us as URI encoded
-  console.log(req.params);
   let searchSkill = decodeURIComponent(req.params.skillname);
   console.log(`Skill search: ${searchSkill}`);
 
   findEmployeesBySkill( searchSkill, (docs) => {
     data.users = docs;
+    data = encodeSkills(data);
     res.render('directory', data);
   })
 })
